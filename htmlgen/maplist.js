@@ -5,16 +5,17 @@ class MapList{
         this.tail = null;
     }
     push_back(elem){
+        if(this.has(elem))this.delete(elem);
         let ref = {
             prev:null,
             next:null,
             elem
         };
+        this.objmap.set(elem,ref);
         if(this.tail === null){//empty
             this.head = ref;
             this.tail = ref;
         }else{
-            this.objmap.set(elem,ref);
             this.tail.next = ref;
             ref.prev = this.tail;
             this.tail = ref;
@@ -33,6 +34,8 @@ class MapList{
         return tail.elem;
     }
     push_front(elem){
+        if(this.has(elem))this.delete(elem);
+        console.log("inserting front: ",elem);
         if(this.head === null){
             this.push(elem);
         }else{
@@ -71,7 +74,7 @@ class MapList{
     }
     getNext(elem){
         if(!this.objmap.has(elem)){
-            throw new Error("warning: trying to get an element that does not exist");
+            throw new Error("Error: trying to get an element that does not exist");
         }
         let ref = this.objmap.get(elem);
         if(ref.next === null)return null;
@@ -79,7 +82,7 @@ class MapList{
     }
     getPrev(elem){
         if(!this.objmap.has(elem)){
-            throw new Error("warning: trying to get an element that does not exist");
+            throw new Error("Error: trying to get an element that does not exist");
         }
         let ref = this.objmap.get(elem);
         if(ref.prev === null)return null;
@@ -102,11 +105,16 @@ class MapList{
             console.log("warning: trying to insert before a non-member element");
             return false;
         }
+        if(elem1 === elem2){
+            console.log("Warning: trying to insert before itself");
+            return false;
+        }
+        if(this.has(elem1))this.delete(elem1);
         let ref2 = this.objmap.get(elem2);
         let ref1 = {
             prev:ref2.prev,
             next:ref2,
-            elem1
+            elem:elem1
         };
         this.objmap.set(elem1,ref1);
         let ref0 = ref2.prev;
@@ -123,11 +131,16 @@ class MapList{
             console.log("warning: trying to insert after a non-member element");
             return false;
         }
+        if(elem1 === elem2){
+            console.log("Warning: trying to insert after itself");
+            return false;
+        }
+        if(this.has(elem2))this.delete(elem2);
         let ref1 = this.objmap.get(elem1);
         let ref2 = {
             prev:ref1,
             next:ref1.next,
-            elem2
+            elem:elem2
         };
         this.objmap.set(elem2,ref2);
         let ref3 = ref1.next;
@@ -152,11 +165,30 @@ class MapList{
         this.tail = null;
         this.objmap.clear();
     }
-    
-    
+    replace(elem,rep){
+        let ref = this.objmap.get(elem);
+        ref.elem = rep;
+        this.objmap.delete(elem);
+        this.objmap.set(rep,ref);
+        return elem;
+    }
+    toArray(){
+        let arr = [];
+        this.foreach((elem)=>{
+            arr.push(elem);
+        });
+        return arr;
+    }
 };
 
 
 //aliases
 MapList.prototype.push = MapList.prototype.push_back;
 MapList.prototype.pop = MapList.prototype.pop_back;
+
+
+
+
+//check if node and export module
+module = module || {};
+module.exports = MapList;
